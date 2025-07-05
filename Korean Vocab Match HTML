@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Korean Vocab Match (한국어 단어 맞추기)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f7cac9, #83a4d4); /* Soft, inviting gradient */
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.98); /* Slightly more opaque */
+            border-radius: 25px; /* More rounded corners */
+            padding: 35px; /* Increased padding */
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25); /* More prominent shadow */
+            text-align: center;
+            width: 100%;
+            max-width: 750px; /* Slightly wider */
+            box-sizing: border-box;
+            border: 2px solid rgba(255, 255, 255, 0.6); /* Thicker, more visible border */
+            margin-bottom: 20px;
+            position: relative; /* For absolute positioning of elements if needed */
+        }
+
+        h1 {
+            font-size: 3.2em; /* Larger main title */
+            color: #3f2b96; /* Deeper purple for main title */
+            margin-bottom: 0px; /* No margin below main title */
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.15); /* More prominent shadow */
+            font-weight: 800; /* Extra bold */
+            line-height: 1.1; /* Tighter line height */
+        }
+
+        h1 span {
+            display: block;
+            font-size: 0.4em; /* Smaller relative to h1, ensures it's a subtitle */
+            color: #6a11cb; /* Matching purple for subtitle */
+            margin-top: 5px;
+            font-weight: 600; /* Semi-bold for subtitle */
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: space-around;
+            /* Adjusted margins for tighter layout */
+            margin-top: 5px;
+            margin-bottom: 5px;
+            font-size: 1.5em; /* Slightly larger info text */
+            font-weight: bold;
+            color: #555;
+            padding: 0 10px;
+        }
+
+        .korean-word-display {
+            background-color: #ffe0b2; /* Light orange */
+            padding: 25px 30px; /* Increased padding */
+            border-radius: 20px; /* More rounded */
+            /* Adjusted margins for tighter layout */
+            margin: 10px auto;
+            font-size: 4em; /* Even larger Korean word */
+            font-weight: 800; /* Extra bold */
+            color: #d35400; /* Darker orange */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* More prominent shadow */
+            max-width: 90%;
+            display: inline-block;
+            min-height: 120px; /* Ensure a minimum height even when empty */
+            display: flex; /* Use flexbox to center content vertically */
+            align-items: center;
+            justify-content: center;
+        }
+
+        .emoji-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); /* Slightly larger min-width for emojis */
+            gap: 20px; /* Increased gap */
+            margin-top: 35px; /* Increased margin */
+            padding: 15px; /* Increased padding */
+            background-color: #f0f4f8;
+            border-radius: 20px; /* More rounded */
+            box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.08); /* More prominent inner shadow */
+        }
+
+        .emoji-option {
+            background-color: #ffffff;
+            border: 3px solid #e0e0e0; /* Thicker border */
+            border-radius: 20px; /* More rounded */
+            padding: 20px;
+            font-size: 4em; /* Larger emoji */
+            cursor: pointer;
+            transition: all 0.25s ease-in-out; /* Slightly longer transition */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            aspect-ratio: 1 / 1;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15); /* More prominent shadow */
+        }
+
+        .emoji-option:hover {
+            transform: translateY(-7px) scale(1.07); /* More pronounced lift */
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.3); /* Stronger shadow on hover */
+            border-color: #a8c0ff;
+        }
+
+        .emoji-option:active {
+            transform: translateY(2px) scale(0.95); /* More pronounced press */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .emoji-option.correct {
+            background-color: #d4edda;
+            border-color: #28a745;
+            box-shadow: 0 0 15px #28a745; /* Glow on correct */
+        }
+
+        .emoji-option.incorrect {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+            box-shadow: 0 0 15px #dc3545; /* Glow on incorrect */
+        }
+
+        .message-box {
+            background-color: #e0f2f7;
+            color: #01579b;
+            padding: 18px 25px; /* Increased padding */
+            border-radius: 12px; /* More rounded */
+            margin-top: 15px;
+            margin-bottom: 25px;
+            font-size: 1.2em; /* Slightly larger font */
+            font-weight: 500; /* Medium weight */
+            border: 1px solid #b3e5fc;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); /* More prominent shadow */
+        }
+
+        .controls {
+            margin-top: 30px; /* Increased margin */
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px; /* Increased gap */
+        }
+
+        button {
+            background: linear-gradient(45deg, #6a11cb, #2575fc);
+            color: white;
+            border: none;
+            padding: 10px 25px; /* Adjusted padding for a good size */
+            border-radius: 30px; /* More rounded */
+            font-size: 1.1em; /* Adjusted font size */
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.25); /* More prominent shadow */
+            transition: all 0.3s ease;
+            outline: none;
+            min-width: 150px; /* Ensure consistent button width */
+        }
+
+        button:hover {
+            background: linear-gradient(45deg, #2575fc, #6a11cb);
+            transform: translateY(-4px); /* More pronounced lift */
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.35); /* Stronger shadow on hover */
+        }
+
+        button:active {
+            transform: translateY(2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        select {
+            padding: 10px 18px; /* Adjusted padding */
+            border-radius: 12px; /* More rounded */
+            border: 2px solid #ccc;
+            font-size: 1em;
+            background-color: #fff;
+            cursor: pointer;
+            transition: border-color 0.2s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #6a11cb;
+            box-shadow: 0 0 0 4px rgba(106, 17, 203, 0.25); /* More prominent focus glow */
+        }
+
+        .instructions {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 25px; /* Increased padding */
+            border-radius: 20px; /* More rounded */
+            margin-top: 30px;
+            color: #333;
+            text-align: left;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* More prominent shadow */
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .instructions h2 {
+            font-size: 2em; /* Larger instruction title */
+            color: #3f2b96;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .instructions ol {
+            list-style-type: decimal;
+            padding-left: 30px; /* More padding */
+            margin-top: 10px;
+            font-size: 1.1em; /* Slightly larger font */
+            line-height: 1.7; /* More comfortable line height */
+        }
+
+        .instructions li {
+            margin-bottom: 10px; /* More spacing between list items */
+        }
+
+        /* New: Start Screen Styling */
+        .start-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #fff3e0; /* Light orange background for start screen */
+            border-radius: 20px;
+            padding: 40px;
+            margin: 30px auto;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.1);
+            min-height: 250px; /* Ensure it takes up space */
+            width: 90%;
+            max-width: 400px;
+            transition: opacity 0.5s ease-out; /* Smooth transition */
+        }
+
+        .start-screen.hidden {
+            opacity: 0;
+            pointer-events: none; /* Disable interaction when hidden */
+            height: 0; /* Collapse height when hidden */
+            padding: 0;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .start-screen label {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #d35400;
+            margin-bottom: 15px;
+        }
+
+        /* Game Over Screen Styling */
+        .game-over-screen {
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #e0f7fa; /* Light blue background */
+            border-radius: 20px;
+            padding: 40px;
+            margin: 30px auto;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.1);
+            min-height: 250px;
+            width: 90%;
+            max-width: 400px;
+            transition: opacity 0.5s ease-out;
+        }
+
+        .game-over-screen.visible {
+            display: flex;
+            opacity: 1;
+        }
+
+        .game-over-screen h2 {
+            font-size: 2.5em;
+            color: #01579b;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .game-over-screen p {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5em;
+            }
+            h1 span {
+                font-size: 0.35em;
+            }
+            .game-info {
+                font-size: 1.1em;
+                margin-top: 5px; /* Even less margin for small screens */
+                margin-bottom: 5px;
+            }
+            .korean-word-display {
+                font-size: 3em;
+                padding: 15px 20px;
+                margin: 10px auto; /* Even less margin for small screens */
+            }
+            .emoji-option {
+                font-size: 3em;
+                padding: 15px;
+            }
+            button {
+                font-size: 0.9em;
+                padding: 8px 18px;
+            }
+            select {
+                font-size: 0.9em;
+                padding: 8px 12px;
+            }
+            .container {
+                padding: 20px;
+            }
+            .instructions {
+                padding: 15px;
+            }
+            .instructions h2 {
+                font-size: 1.8em;
+            }
+            .start-screen, .game-over-screen {
+                padding: 20px;
+                min-height: 200px;
+            }
+            .game-over-screen h2 {
+                font-size: 2em;
+            }
+            .game-over-screen p {
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Korean Vocab Match <span>(한국어 단어 맞추기)</span></h1>
+
+        <div id="messageBox" class="message-box">Match the Korean word to the correct emoji!</div>
+
+        <div class="game-info">
+            <div>Score: <span id="score">0</span></div>
+            <div>Level: <span id="level">1</span></div>
+            <div>Correct in Level: <span id="correctInLevel">0</span>/<span id="levelGoal">10</span></div> <!-- Updated LEVEL_GOAL display -->
+        </div>
+
+        <!-- Initial Start Screen -->
+        <div id="startScreen" class="start-screen">
+            <label for="vocabLevelSelect">Choose Starting Level:</label>
+            <select id="vocabLevelSelect">
+                <option value="1">Level 1 (Basic)</option>
+                <option value="2">Level 2 (Intermediate)</option>
+                <option value="3">Level 3 (Advanced)</option>
+            </select>
+            <button id="startButton" style="margin-top: 20px;">Start Game</button>
+        </div>
+
+        <!-- Game Over Screen (initially hidden) -->
+        <div id="gameOverScreen" class="game-over-screen">
+            <h2 id="gameOverMessage"></h2>
+            <p>Your Final Score: <span id="finalScore">0</span></p>
+            <button id="playAgainButton">Play Again</button>
+        </div>
+
+        <!-- Main Game Elements (initially hidden or empty) -->
+        <div class="korean-word-display" id="koreanWordDisplay"></div>
+        <div class="emoji-grid" id="emojiGrid"></div>
+
+    </div>
+
+    <div class="container instructions">
+        <h2>How to Play</h2>
+        <ol>
+            <li>Choose your starting vocabulary level using the dropdown.</li>
+            <li>Click "Start Game" to begin.</li>
+            <li>A Korean word will appear in the center.</li>
+            <li>Below it, several emojis will be displayed. Click on the emoji that best represents the meaning of the Korean word.</li>
+            <li>Get 10 correct answers in a row to advance to the next level.</li>
+            <li>If you choose incorrectly, your "Correct in Level" counter resets, but your total score remains.</li>
+            <li>The game continues as long as you keep matching words!</li>
+            <li>Click "Play Again" after the game ends to start over.</li>
+        </ol>
+    </div>
+
+    <script>
+        // DOM Elements
+        const koreanWordDisplay = document.getElementById('koreanWordDisplay');
+        const emojiGrid = document.getElementById('emojiGrid');
+        const scoreDisplay = document.getElementById('score');
+        const levelDisplay = document.getElementById('level');
+        const correctInLevelDisplay = document.getElementById('correctInLevel');
+        const levelGoalDisplay = document.getElementById('levelGoal');
+        const vocabLevelSelect = document.getElementById('vocabLevelSelect');
+        const startButton = document.getElementById('startButton');
+        const messageBox = document.getElementById('messageBox');
+        const startScreen = document.getElementById('startScreen');
+        const gameOverScreen = document.getElementById('gameOverScreen');
+        const gameOverMessage = document.getElementById('gameOverMessage');
+        const finalScoreDisplay = document.getElementById('finalScore');
+        const playAgainButton = document.getElementById('playAgainButton');
+
+
+        // Game Variables
+        let score = 0;
+        let currentLevel = 1;
+        const LEVEL_GOAL = 10; // Number of correct answers to advance level (Updated to 10)
+        let correctAnswersInCurrentLevel = 0;
+        let currentQuestion = null; // Stores the current word and its correct emoji
+        let allEmojis = []; // All unique emojis from all vocab levels for incorrect options
+        let currentLevelQuestions = []; // Stores the 10 unique questions for the current level
+        let questionsAskedInCurrentRound = []; // Tracks questions already asked in the current 10-question round
+
+        // Vocabulary Data (Korean Word, English Meaning, Associated Emoji)
+        // Expanded and diversified vocabulary
+        const vocabulary = {
+            1: [ // Level 1: Basic words (10+ items)
+                { word: "안녕하세요", meaning: "Hello", emoji: "👋" },
+                { word: "감사합니다", meaning: "Thank you", emoji: "🙏" },
+                { word: "네", meaning: "Yes", emoji: "👍" },
+                { word: "아니요", meaning: "No", emoji: "👎" },
+                { word: "사랑", meaning: "Love", emoji: "❤️" },
+                { word: "친구", meaning: "Friend", emoji: "👫" },
+                { word: "물", meaning: "Water", emoji: "💧" },
+                { word: "밥", meaning: "Rice/Meal", emoji: "🍚" },
+                { word: "책", meaning: "Book", emoji: "📚" },
+                { word: "집", meaning: "House", emoji: "🏠" },
+                { word: "고양이", meaning: "Cat", emoji: "🐱" },
+                { word: "개", meaning: "Dog", emoji: "🐶" },
+                { word: "빨간색", meaning: "Red", emoji: "🔴" },
+                { word: "파란색", meaning: "Blue", emoji: "🔵" },
+                { word: "원", meaning: "Circle", emoji: "⚪" },
+            ],
+            2: [ // Level 2: Intermediate (10+ items)
+                { word: "학교", meaning: "School", emoji: "🏫" },
+                { word: "음악", meaning: "Music", emoji: "🎶" },
+                { word: "여행", meaning: "Travel", emoji: "✈️" },
+                { word: "자동차", meaning: "Car", emoji: "🚗" },
+                { word: "컴퓨터", meaning: "Computer", emoji: "💻" },
+                { word: "커피", meaning: "Coffee", emoji: "☕" },
+                { word: "공부", meaning: "Study", emoji: "✏️" },
+                { word: "날씨", meaning: "Weather", emoji: "☀️" },
+                { word: "병원", meaning: "Hospital", emoji: "🏥" },
+                { word: "시장", meaning: "Market", emoji: "🛍️" },
+                { word: "남자", meaning: "Man/Boy", emoji: "👨" },
+                { word: "여자", meaning: "Woman/Girl", emoji: "👩" },
+                { word: "아기", meaning: "Baby", emoji: "👶" },
+                { word: "초록색", meaning: "Green", emoji: "🟢" },
+                { word: "삼각형", meaning: "Triangle", emoji: "🔺" },
+            ],
+            3: [ // Level 3: Advanced (10+ items)
+                { word: "행복", meaning: "Happiness", emoji: "😊" },
+                { word: "슬픔", meaning: "Sadness", emoji: "😔" },
+                { word: "꿈", meaning: "Dream", emoji: "💭" },
+                { word: "시간", meaning: "Time", emoji: "⏰" },
+                { word: "미래", meaning: "Future", emoji: "🔮" },
+                { word: "과거", meaning: "Past", emoji: "🔙" },
+                { word: "희망", meaning: "Hope", emoji: "✨" },
+                { word: "평화", meaning: "Peace", emoji: "🕊️" },
+                { word: "성공", meaning: "Success", emoji: "🏆" },
+                { word: "실패", meaning: "Failure", emoji: "❌" },
+                { word: "할아버지", meaning: "Grandfather", emoji: "👴" },
+                { word: "할머니", meaning: "Grandmother", emoji: "👵" },
+                { word: "검은색", meaning: "Black", emoji: "⚫" },
+                { word: "흰색", meaning: "White", emoji: "⚪" },
+                { word: "사각형", meaning: "Square", emoji: "🟥" },
+            ]
+        };
+
+        // Collect all unique emojis for incorrect options
+        function populateAllEmojis() {
+            const tempSet = new Set();
+            for (const levelKey in vocabulary) {
+                vocabulary[levelKey].forEach(item => tempSet.add(item.emoji));
+            }
+            allEmojis = Array.from(tempSet);
+        }
+
+        // --- Game Initialization and Reset ---
+        function initGame() {
+            score = 0;
+            currentLevel = parseInt(vocabLevelSelect.value); // Set initial level from dropdown
+            correctAnswersInCurrentLevel = 0;
+            questionsAskedInCurrentRound = []; // Reset asked questions
+            updateDisplay();
+            messageBox.textContent = "Match the Korean word to the correct emoji!"; // Initial instruction message
+
+            // Hide game elements, show start screen
+            koreanWordDisplay.style.display = 'none';
+            emojiGrid.style.display = 'none';
+            gameOverScreen.classList.remove('visible');
+            startScreen.classList.remove('hidden');
+
+            koreanWordDisplay.textContent = ""; // Ensure word display is empty
+            emojiGrid.innerHTML = ''; // Clear emojis from grid
+
+            populateAllEmojis(); // Ensure allEmojis is populated
+        }
+
+        // --- Start Game / Next Question Logic ---
+        function startGame() {
+            // Hide start screen, show game elements
+            startScreen.classList.add('hidden');
+            koreanWordDisplay.style.display = 'flex'; // Use flex to center content
+            emojiGrid.style.display = 'grid';
+
+            // Prepare questions for the current level
+            currentLevelQuestions = [...vocabulary[currentLevel]]; // Copy vocab for the level
+            questionsAskedInCurrentRound = []; // Reset for the new round/level
+
+            generateQuestion();
+        }
+
+        function generateQuestion() {
+            // Re-enable clicks on emojis for the new question
+            Array.from(emojiGrid.children).forEach(optionDiv => {
+                optionDiv.removeEventListener('click', handleAnswer); // Remove old listener
+                optionDiv.classList.remove('correct', 'incorrect'); // Clear feedback styles
+                optionDiv.addEventListener('click', handleAnswer); // Add new listener
+            });
+
+            // Filter out questions already asked in this round
+            const availableQuestions = currentLevelQuestions.filter(q => !questionsAskedInCurrentRound.includes(q));
+
+            if (availableQuestions.length === 0) {
+                // All questions for this level have been asked
+                messageBox.textContent = `Level ${currentLevel} complete! Advancing...`;
+                setTimeout(advanceLevel, 1500);
+                return;
+            }
+
+            // Select a random unasked question
+            const randomIndex = Math.floor(Math.random() * availableQuestions.length);
+            currentQuestion = availableQuestions[randomIndex];
+            questionsAskedInCurrentRound.push(currentQuestion); // Mark as asked
+
+            koreanWordDisplay.textContent = currentQuestion.word;
+            messageBox.textContent = "Choose the matching emoji!"; // Prompt for the current question
+
+            const options = [currentQuestion.emoji];
+            const incorrectEmojis = allEmojis.filter(emoji => emoji !== currentQuestion.emoji);
+
+            // Add 5 random incorrect emojis (or fewer if not enough unique ones)
+            while (options.length < 6 && incorrectEmojis.length > 0) {
+                const randomIncorrectIndex = Math.floor(Math.random() * incorrectEmojis.length);
+                options.push(incorrectEmojis.splice(randomIncorrectIndex, 1)[0]);
+            }
+
+            options.sort(() => Math.random() - 0.5);
+
+            emojiGrid.innerHTML = '';
+            options.forEach(emoji => {
+                const div = document.createElement('div');
+                div.classList.add('emoji-option');
+                div.textContent = emoji;
+                div.dataset.emoji = emoji;
+                div.addEventListener('click', handleAnswer);
+                emojiGrid.appendChild(div);
+            });
+        }
+
+        // --- Handle User Answer ---
+        function handleAnswer(event) {
+            // Disable all emoji clicks immediately after an answer
+            Array.from(emojiGrid.children).forEach(optionDiv => {
+                optionDiv.removeEventListener('click', handleAnswer);
+            });
+
+            const clickedEmoji = event.target.dataset.emoji;
+            const isCorrect = (clickedEmoji === currentQuestion.emoji);
+
+            // Visual feedback
+            Array.from(emojiGrid.children).forEach(optionDiv => {
+                if (optionDiv.dataset.emoji === currentQuestion.emoji) {
+                    optionDiv.classList.add('correct');
+                } else if (optionDiv.dataset.emoji === clickedEmoji && !isCorrect) {
+                    optionDiv.classList.add('incorrect');
+                }
+            });
+
+            if (isCorrect) {
+                score++;
+                correctAnswersInCurrentLevel++;
+                messageBox.textContent = "Correct! 🎉";
+                updateDisplay();
+
+                if (correctAnswersInCurrentLevel >= LEVEL_GOAL) {
+                    // All 10 questions answered correctly for this level
+                    messageBox.textContent = `Level ${currentLevel} complete! Advancing...`;
+                    setTimeout(advanceLevel, 1500);
+                } else {
+                    setTimeout(generateQuestion, 1000); // Next question after short delay
+                }
+            } else {
+                correctAnswersInCurrentLevel = 0; // Reset streak on incorrect answer
+                messageBox.textContent = `Incorrect! The answer was "${currentQuestion.meaning}" (${currentQuestion.emoji}).`;
+                updateDisplay();
+                setTimeout(generateQuestion, 1500); // Next question after short delay
+            }
+        }
+
+        // --- Level Progression ---
+        function advanceLevel() {
+            currentLevel++;
+            if (vocabulary[currentLevel]) {
+                correctAnswersInCurrentLevel = 0;
+                questionsAskedInCurrentRound = []; // Reset for new level
+                currentLevelQuestions = [...vocabulary[currentLevel]]; // Load new level's questions
+                messageBox.textContent = `Welcome to Level ${currentLevel}!`;
+                updateDisplay();
+                generateQuestion();
+            } else {
+                // All levels completed!
+                koreanWordDisplay.style.display = 'none';
+                emojiGrid.style.display = 'none';
+                messageBox.textContent = "Game Over!";
+                gameOverMessage.textContent = "Congratulations! You completed all levels!";
+                finalScoreDisplay.textContent = score;
+                gameOverScreen.classList.add('visible');
+            }
+        }
+
+        // --- Update UI Display ---
+        function updateDisplay() {
+            scoreDisplay.textContent = score;
+            levelDisplay.textContent = currentLevel;
+            correctInLevelDisplay.textContent = correctAnswersInCurrentLevel;
+            levelGoalDisplay.textContent = LEVEL_GOAL;
+        }
+
+        // --- Event Listeners ---
+        startButton.addEventListener('click', startGame);
+        playAgainButton.addEventListener('click', initGame); // Play Again button for game over screen
+        vocabLevelSelect.addEventListener('change', initGame); // Reset game if level is changed
+
+        // Initialize the game on window load
+        window.onload = function() {
+            populateAllEmojis();
+            initGame();
+        };
+    </script>
+</body>
+</html>
