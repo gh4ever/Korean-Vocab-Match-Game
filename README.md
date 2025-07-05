@@ -1,7 +1,7 @@
 # Korean-Vocab-Match-Game
 Match the Korean word to the correct emoji!
 
-<<How to Play>>
+!!How to Play!!
 
 Choose your starting vocabulary level using the dropdown.
 Click "Start Game" to begin.
